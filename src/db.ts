@@ -474,3 +474,21 @@ export function todosProdutos() {
 export function setarEmbeddingProduto(index: number, embedding: number[]) {
   produtos[index].embedding = embedding;
 }
+
+function cosineSimilarity(a: number[], b: number[]): number {
+  const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+  const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+  const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+export function produtosSimilares(embedding: number[]) {
+  return produtos
+    .filter((produto) => produto.embedding)
+    .map((produto) => ({
+      ...produto,
+      similaridade: cosineSimilarity(produto.embedding!, embedding),
+    }))
+    .sort((a, b) => b.similaridade - a.similaridade)
+    .slice(0, 10);
+}

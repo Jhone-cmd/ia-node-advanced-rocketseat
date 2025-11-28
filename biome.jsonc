@@ -17,6 +17,13 @@
       },
       "nursery": {
         "noShadow": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "off",
+        "noUndeclaredVariables": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
       }
     }
   }

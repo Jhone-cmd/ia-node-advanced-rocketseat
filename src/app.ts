@@ -1,5 +1,5 @@
 import express from 'express';
-import { todosProdutos } from './db.ts';
+import { produtosSimilares, todosProdutos } from './db.ts';
 import {
   embedProdutos,
   generateEmbedding,
@@ -29,7 +29,7 @@ app.post('/process-embedding', async (_, res) => {
 
 app.post('/embedding', async (req, res) => {
   try {
-    const input = req.body.input;
+    const { input } = req.body;
     await generateEmbedding(input);
     res.status(200).json('Embedding generated successfully');
   } catch (error) {
@@ -37,4 +37,20 @@ app.post('/embedding', async (req, res) => {
     res.status(500).json('Internal Server Error');
     return;
   }
+});
+
+app.post('/cart', async (req, res) => {
+  const { message } = req.body;
+  const embedding = await generateEmbedding(message);
+  if (!embedding) {
+    res.status(500).json('Internal Server Error. Failed to generate embedding');
+    return;
+  }
+  const produtos = produtosSimilares(embedding);
+  res.status(200).json({
+    produtos: produtos.map((produto) => ({
+      nome: produto.nome,
+      embedding: produto.embedding,
+    })),
+  });
 });
