@@ -5,7 +5,12 @@ import type {
   ChatCompletionTool,
 } from 'openai/resources';
 import z from 'zod';
-import { produtosEmEstoque, produtosEmFalta } from './db.ts';
+import {
+  produtosEmEstoque,
+  produtosEmFalta,
+  setarEmbeddingProduto,
+  todosProdutos,
+} from './db.ts';
 import { env } from './env/schema.ts';
 
 const client = new OpenAI({
@@ -112,11 +117,33 @@ export async function generateProducts(message: string) {
 }
 
 export async function generateEmbedding(input: string) {
-  const response = await client.embeddings.create({
-    model: 'text-embedding-3-small',
-    input,
-    encoding_format: 'float',
-  });
+  try {
+    const response = await client.embeddings.create({
+      model: 'text-embedding-3-small',
+      input,
+      encoding_format: 'float',
+    });
 
-  console.dir(response, { depth: null });
+    return response.data[0].embedding;
+  } catch (error) {
+    console.error('Error generating embedding:', error);
+    return;
+  }
+}
+
+export async function embedProdutos() {
+  const produtos = todosProdutos();
+  await Promise.allSettled(
+    produtos.map(async (produto, index) => {
+      const embedding = await generateEmbedding(
+        `${produto.nome}: ${produto.descricao}`
+      );
+
+      if (!embedding) {
+        return;
+      }
+
+      setarEmbeddingProduto(index, embedding);
+    })
+  );
 }

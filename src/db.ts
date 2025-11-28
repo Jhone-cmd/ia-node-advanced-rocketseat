@@ -470,3 +470,7 @@ export function produtosEmFalta() {
 export function todosProdutos() {
   return [...produtos];
 }
+
+export function setarEmbeddingProduto(index: number, embedding: number[]) {
+  produtos[index].embedding = embedding;
+}
