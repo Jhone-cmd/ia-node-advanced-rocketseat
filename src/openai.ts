@@ -110,3 +110,13 @@ export async function generateProducts(message: string) {
 
   return completion.choices[0].message.parsed;
 }
+
+export async function generateEmbedding(input: string) {
+  const response = await client.embeddings.create({
+    model: 'text-embedding-3-small',
+    input,
+    encoding_format: 'float',
+  });
+
+  console.dir(response, { depth: null });
+}
