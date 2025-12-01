@@ -3,6 +3,7 @@ import path from 'node:path';
 import express from 'express';
 import { produtosSimilares, todosProdutos } from './db.ts';
 import {
+  createVector,
   embedProdutos,
   generateCart,
   generateEmbedding,
@@ -76,5 +77,10 @@ app.post('/upload', async (_, res) => {
   const file = createReadStream(path.join('..', 'static', 'recipes.md'));
   await uploadFile(file);
 
+  res.status(201).end();
+});
+
+app.post('/vector-store', async (_, res) => {
+  await createVector();
   res.status(201).end();
 });

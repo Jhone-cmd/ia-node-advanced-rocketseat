@@ -179,3 +179,12 @@ export async function uploadFile(file: ReadStream) {
 
   console.dir(uploaded, { depth: null });
 }
+
+export async function createVector() {
+  const vectorStore = await client.vectorStores.create({
+    name: 'ia-node-search-class',
+    file_ids: ['file-as4d5a6sd78wad8456xc'],
+  });
+
+  console.dir(vectorStore, { depth: null });
+}
