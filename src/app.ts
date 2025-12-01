@@ -1,3 +1,5 @@
+import { createReadStream } from 'node:fs';
+import path from 'node:path';
 import express from 'express';
 import { produtosSimilares, todosProdutos } from './db.ts';
 import {
@@ -5,6 +7,7 @@ import {
   generateCart,
   generateEmbedding,
   generateProducts,
+  uploadFile,
 } from './openai.ts';
 
 export const app = express();
@@ -67,4 +70,11 @@ app.post('/response', async (req, res) => {
     'vinagre',
   ]);
   res.status(200).json(cart);
+});
+
+app.post('/upload', async (_, res) => {
+  const file = createReadStream(path.join('..', 'static', 'recipes.md'));
+  await uploadFile(file);
+
+  res.status(201).end();
 });

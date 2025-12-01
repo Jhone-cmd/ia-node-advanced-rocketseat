@@ -1,3 +1,4 @@
+import type { ReadStream } from 'node:fs';
 import OpenAI from 'openai';
 import { zodResponseFormat, zodTextFormat } from 'openai/helpers/zod';
 import type {
@@ -168,4 +169,13 @@ export async function generateCart(input: string, products: string[]) {
       format: zodTextFormat(schemaProducts, 'carrinho'),
     },
   });
+}
+
+export async function uploadFile(file: ReadStream) {
+  const uploaded = await client.files.create({
+    file,
+    purpose: 'assistants',
+  });
+
+  console.dir(uploaded, { depth: null });
 }
