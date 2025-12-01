@@ -162,8 +162,14 @@ async function generateResponse(params: ResponseCreateParamsNonStreaming) {
 
 export async function generateCart(input: string, products: string[]) {
   return generateResponse({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-nano',
     instructions: `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário. Os produtos disponíveis são os seguintes: ${JSON.stringify(products)}`,
+    tools: [
+      {
+        type: 'file_search',
+        vector_store_ids: ['vs-as4d56aw8efd456rfc09'],
+      },
+    ],
     input,
     text: {
       format: zodTextFormat(schemaProducts, 'carrinho'),

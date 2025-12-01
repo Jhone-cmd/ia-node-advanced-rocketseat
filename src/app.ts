@@ -63,19 +63,18 @@ app.post('/cart', async (req, res) => {
 app.post('/response', async (req, res) => {
   const { input } = req.body;
 
-  const cart = await generateCart(input, [
-    'feijão',
-    'arroz',
-    'macarrão',
-    'detergente',
-    'vinagre',
-  ]);
+  const cart = await generateCart(
+    input,
+    todosProdutos().map((product) => product.nome)
+  );
   res.status(200).json(cart);
 });
 
 app.post('/upload', async (_, res) => {
-  const file = createReadStream(path.join('..', 'static', 'recipes.md'));
-  await uploadFile(file);
+  const file = createReadStream(
+    path.join(__dirname, '..', 'static', 'recipes.md')
+  );
+  uploadFile(file);
 
   res.status(201).end();
 });
