@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { zodResponseFormat } from 'openai/helpers/zod';
+import { zodResponseFormat, zodTextFormat } from 'openai/helpers/zod';
 import type {
   ChatCompletionMessageParam,
   ChatCompletionTool,
@@ -157,4 +157,15 @@ async function generateResponse(params: ResponseCreateParamsNonStreaming) {
   }
 
   return null;
+}
+
+export async function generateCart(input: string, products: string[]) {
+  return generateResponse({
+    model: 'gpt-4o-nano',
+    instructions: `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário. Os produtos disponíveis são os seguintes: ${JSON.stringify(products)}`,
+    input,
+    text: {
+      format: zodTextFormat(schemaProducts, 'carrinho'),
+    },
+  });
 }
