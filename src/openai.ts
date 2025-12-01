@@ -161,7 +161,7 @@ async function generateResponse(params: ResponseCreateParamsNonStreaming) {
 
 export async function generateCart(input: string, products: string[]) {
   return generateResponse({
-    model: 'gpt-4o-nano',
+    model: 'gpt-4o-mini',
     instructions: `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário. Os produtos disponíveis são os seguintes: ${JSON.stringify(products)}`,
     input,
     text: {

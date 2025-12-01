@@ -2,6 +2,7 @@ import express from 'express';
 import { produtosSimilares, todosProdutos } from './db.ts';
 import {
   embedProdutos,
+  generateCart,
   generateEmbedding,
   generateProducts,
 } from './openai.ts';
@@ -53,4 +54,17 @@ app.post('/cart', async (req, res) => {
       embedding: produto.embedding,
     })),
   });
+});
+
+app.post('/response', async (req, res) => {
+  const { input } = req.body;
+
+  const cart = await generateCart(input, [
+    'feijão',
+    'arroz',
+    'macarrão',
+    'detergente',
+    'vinagre',
+  ]);
+  res.status(200).json(cart);
 });
