@@ -4,6 +4,7 @@ import type {
   ChatCompletionMessageParam,
   ChatCompletionTool,
 } from 'openai/resources';
+import type { ResponseCreateParamsNonStreaming } from 'openai/resources/responses/responses.mjs';
 import z from 'zod';
 import {
   produtosEmEstoque,
@@ -146,4 +147,14 @@ export async function embedProdutos() {
       setarEmbeddingProduto(index, embedding);
     })
   );
+}
+
+async function generateResponse(params: ResponseCreateParamsNonStreaming) {
+  const response = await client.responses.parse(params);
+
+  if (response.output_parsed) {
+    return response.output_parsed;
+  }
+
+  return null;
 }
