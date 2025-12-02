@@ -233,3 +233,7 @@ export async function createEmbeddingBatch(fileId: string) {
 
   return batch;
 }
+
+export async function getBatch(id: string) {
+  return await client.batches.retrieve(id);
+}

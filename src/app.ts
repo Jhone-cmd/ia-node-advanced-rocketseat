@@ -11,6 +11,7 @@ import {
   generateCart,
   generateEmbedding,
   generateProducts,
+  getBatch,
   uploadFile,
 } from './openai.ts';
 
@@ -92,5 +93,11 @@ app.post('/vector-store', async (_, res) => {
 app.post('/embedding-batch', async (_, res) => {
   const file = await createEmbeddingBatchFile(['sorvete', 'alface']);
   const batch = await createEmbeddingBatch(file.id);
+  res.status(200).json(batch);
+});
+
+app.post('/embedding-batch/results', async (_, res) => {
+  const batch = await getBatch('batch-as5d68as9d8afg8d79s564');
+
   res.status(200).json(batch);
 });
