@@ -12,6 +12,7 @@ import {
   generateEmbedding,
   generateProducts,
   getBatch,
+  getBatchFileContent,
   uploadFile,
 } from './openai.ts';
 
@@ -99,5 +100,13 @@ app.post('/embedding-batch', async (_, res) => {
 app.post('/embedding-batch/results', async (_, res) => {
   const batch = await getBatch('batch-as5d68as9d8afg8d79s564');
 
-  res.status(200).json(batch);
+  if (batch.status !== 'completed' || !batch.output_file_id) {
+    res.status(200).json(batch);
+    return;
+  }
+
+  // console.log('TODO: process results', batch.output_file_id);
+  const file = await getBatchFileContent(batch.output_file_id);
+
+  res.status(200).json(file);
 });

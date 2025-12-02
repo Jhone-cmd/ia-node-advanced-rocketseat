@@ -237,3 +237,8 @@ export async function createEmbeddingBatch(fileId: string) {
 export async function getBatch(id: string) {
   return await client.batches.retrieve(id);
 }
+
+export async function getBatchFileContent(id: string) {
+  const response = await client.files.content(id);
+  return await response.text();
+}
