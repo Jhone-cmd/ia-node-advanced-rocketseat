@@ -1,6 +1,5 @@
 import type { ReadStream } from 'node:fs';
-import { writeFile } from 'node:fs/promises';
-import path, { dirname } from 'node:path';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import OpenAI from 'openai';
 import { zodResponseFormat, zodTextFormat } from 'openai/helpers/zod';
@@ -216,7 +215,21 @@ export async function createEmbeddingBatchFile(products: string[]) {
     .map((product) => JSON.stringify(product))
     .join('\n');
 
-  await writeFile(path.join(__dirname, 'file.jsonl'), content);
+  const file = new File([content], 'embeddings-batch.jsonl');
+  const uploaded = await client.files.create({
+    file,
+    purpose: 'batch',
+  });
+
+  return uploaded;
 }
 
-createEmbeddingBatchFile(['sorvete', 'alface']);
+export async function createEmbeddingBatch(fileId: string) {
+  const batch = await client.batches.create({
+    input_file_id: fileId,
+    endpoint: '/v1/embeddings',
+    completion_window: '24h',
+  });
+
+  return batch;
+}

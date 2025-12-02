@@ -1,8 +1,11 @@
 import { createReadStream } from 'node:fs';
-import path from 'node:path';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { produtosSimilares, todosProdutos } from './db.ts';
 import {
+  createEmbeddingBatch,
+  createEmbeddingBatchFile,
   createVector,
   embedProdutos,
   generateCart,
@@ -71,6 +74,8 @@ app.post('/response', async (req, res) => {
 });
 
 app.post('/upload', async (_, res) => {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
   const file = createReadStream(
     path.join(__dirname, '..', 'static', 'recipes.md')
   );
@@ -82,4 +87,10 @@ app.post('/upload', async (_, res) => {
 app.post('/vector-store', async (_, res) => {
   await createVector();
   res.status(201).end();
+});
+
+app.post('/embedding-batch', async (_, res) => {
+  const file = await createEmbeddingBatchFile(['sorvete', 'alface']);
+  const batch = await createEmbeddingBatch(file.id);
+  res.status(200).json(batch);
 });
