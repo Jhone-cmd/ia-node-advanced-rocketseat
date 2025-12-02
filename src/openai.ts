@@ -1,4 +1,7 @@
 import type { ReadStream } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import OpenAI from 'openai';
 import { zodResponseFormat, zodTextFormat } from 'openai/helpers/zod';
 import type {
@@ -194,3 +197,26 @@ export async function createVector() {
 
   console.dir(vectorStore, { depth: null });
 }
+
+export async function createEmbeddingBatchFile(products: string[]) {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+
+  const content = products
+    .map((product, index) => ({
+      custom_id: String(index),
+      method: 'POST',
+      url: '/v1/embeddings',
+      body: {
+        input: product,
+        model: 'text-embedding-3-small',
+        encoding_format: 'float',
+      },
+    }))
+    .map((product) => JSON.stringify(product))
+    .join('\n');
+
+  await writeFile(path.join(__dirname, 'file.jsonl'), content);
+}
+
+createEmbeddingBatchFile(['sorvete', 'alface']);
