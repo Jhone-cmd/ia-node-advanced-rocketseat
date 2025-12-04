@@ -178,16 +178,16 @@ export function createCartChunks(input: string, products: string[]) {
 }
 
 export async function generateCart(input: string, products: string[]) {
-  const promises = createCartChunks(input, products).map((chunk) =>
-    generateResponse<{ products: string[] }>({
-      model: 'gpt-4.1-nano',
+  const promises = createCartChunks(input, products).map((chunk) => {
+    return generateResponse<{ products: string[] }>({
+      model: 'gpt-4o-mini',
       instructions: chunk,
       input,
       text: {
         format: zodTextFormat(schemaProducts, 'carrinho'),
       },
-    })
-  );
+    });
+  });
 
   const result = await Promise.all(promises);
 

@@ -17,7 +17,8 @@
         "useIterableCallbackReturn": "off"
       },
       "nursery": {
-        "noShadow": "off"
+        "noShadow": "off",
+        "useConsistentArrowReturn": "off"
       },
       "correctness": {
         "noUnusedVariables": "off",
