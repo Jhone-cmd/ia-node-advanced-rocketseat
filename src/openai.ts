@@ -152,17 +152,19 @@ export async function embedProdutos() {
   );
 }
 
-async function generateResponse(params: ResponseCreateParamsNonStreaming) {
+async function generateResponse<T = null>(
+  params: ResponseCreateParamsNonStreaming
+) {
   const response = await client.responses.parse(params);
 
   if (response.output_parsed) {
-    return response.output_parsed;
+    return response.output_parsed as T;
   }
 
   return null;
 }
 
-export async function createCartChunks(input: string, products: string[]) {
+export function createCartChunks(input: string, products: string[]) {
   const chunkSize = 100;
   const chunks: string[] = [];
 
@@ -176,8 +178,8 @@ export async function createCartChunks(input: string, products: string[]) {
 }
 
 export async function generateCart(input: string, products: string[]) {
-  return (await createCartChunks(input, products)).map((chunk) =>
-    generateResponse({
+  const promises = createCartChunks(input, products).map((chunk) =>
+    generateResponse<{ products: string[] }>({
       model: 'gpt-4.1-nano',
       instructions: chunk,
       input,
@@ -186,6 +188,12 @@ export async function generateCart(input: string, products: string[]) {
       },
     })
   );
+
+  const result = await Promise.all(promises);
+
+  return result
+    .filter((r): r is { products: string[] } => Boolean(r))
+    .flatMap((r) => r.products);
 
   // return generateResponse({
   //   model: 'gpt-4.1-nano',
