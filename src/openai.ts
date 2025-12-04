@@ -170,31 +170,7 @@ export function createCartChunks(input: string, products: string[]) {
 
   for (let i = 0; i < chunkSize; i += chunkSize) {
     chunks.push(
-      `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário. 
-      
-        1. Divida o prato em components principais.
-        2. Para cada componente, forneça uma lista de produtos que podem ser usados para prepará-lo.
-        3. Liste todos os produtos necessários para todos os componentes.
-
-      -------------------
-        Exemplo:
-
-
-          - Produtos disponíveis: Farinha de trigo, Açúcar, Manteiga, Sal, Limão, Ovos, Creme de leite, Morango, Chocolate, Leite condensado, Biscoito, Gelatina
-          - Necessidade do usuário: Torta de Limão
-            1. Divida o prato em components principais.
-              - Massa, Recheio, Cobertura
-
-            2. Para cada componente, forneça uma lista de produtos que podem ser usados para prepará-lo.
-              - Massa: farinha de trigo, açúcar, manteiga, Sal
-              - Recheio: limão, açúcar, ovos
-              - Cobertura: creme de leite, açúcar
-
-            3. Liste todos os produtos necessários para todos os componentes.
-              - farinha de trigo, açúcar, manteiga, sal, limão, ovos, creme de leite
-
-      -------------------      
-      Os produtos disponíveis são os seguintes: ${JSON.stringify(products.slice(i, i + chunkSize))}    
+      `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário. Os produtos disponíveis são os seguintes: ${JSON.stringify(products.slice(i, i + chunkSize))}    
   `
     );
   }
@@ -203,11 +179,25 @@ export function createCartChunks(input: string, products: string[]) {
 }
 
 export async function generateCart(input: string, products: string[]) {
+  const ingredientes = await client.responses.create({
+    model: 'gpt-4o-mini',
+    instructions: `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário.       
+        1. Divida o prato em components principais.
+        2. Para cada componente, forneça uma lista de produtos que podem ser usados para prepará-lo.`,
+    input,
+    text: {
+      format: zodTextFormat(
+        z.object({ ingredientes: z.array(z.string()) }),
+        'ingredientes'
+      ),
+    },
+  });
+
   const promises = createCartChunks(input, products).map((chunk) => {
     return generateResponse<{ products: string[] }>({
       model: 'gpt-4o-mini',
       instructions: chunk,
-      input,
+      input: `${input}: ingredientes necessários ${ingredientes}`,
       text: {
         format: zodTextFormat(schemaProducts, 'carrinho'),
       },
