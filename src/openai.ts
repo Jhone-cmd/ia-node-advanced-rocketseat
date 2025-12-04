@@ -162,21 +162,45 @@ async function generateResponse(params: ResponseCreateParamsNonStreaming) {
   return null;
 }
 
+export async function createCartChunks(input: string, products: string[]) {
+  const chunkSize = 100;
+  const chunks: string[] = [];
+
+  for (let i = 0; i < chunkSize; i += chunkSize) {
+    chunks.push(
+      `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário. Os produtos disponíveis são os seguintes: ${JSON.stringify(products.slice(i, i + chunkSize))}`
+    );
+  }
+
+  return chunks;
+}
+
 export async function generateCart(input: string, products: string[]) {
-  return generateResponse({
-    model: 'gpt-4.1-nano',
-    instructions: `Retorne uma lista de até 5 produtos que satisfação a necessidade do usuário. Os produtos disponíveis são os seguintes: ${JSON.stringify(products)}`,
-    tools: [
-      {
-        type: 'file_search',
-        vector_store_ids: ['vs-as4d56aw8efd456rfc09'],
+  return (await createCartChunks(input, products)).map((chunk) =>
+    generateResponse({
+      model: 'gpt-4.1-nano',
+      instructions: chunk,
+      input,
+      text: {
+        format: zodTextFormat(schemaProducts, 'carrinho'),
       },
-    ],
-    input,
-    text: {
-      format: zodTextFormat(schemaProducts, 'carrinho'),
-    },
-  });
+    })
+  );
+
+  // return generateResponse({
+  //   model: 'gpt-4.1-nano',
+  //   instructions:
+  //   tools: [
+  //     {
+  //       type: 'file_search',
+  //       vector_store_ids: ['vs-as4d56aw8efd456rfc09'],
+  //     },
+  //   ],
+  //   input,
+  //   text: {
+  //     format: zodTextFormat(schemaProducts, 'carrinho'),
+  //   },
+  // });
 }
 
 export async function uploadFile(file: ReadStream) {

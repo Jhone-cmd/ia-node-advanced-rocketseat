@@ -21,7 +21,8 @@
       },
       "correctness": {
         "noUnusedVariables": "off",
-        "noUndeclaredVariables": "off"
+        "noUndeclaredVariables": "off",
+        "noUnusedFunctionParameters": "off"
       },
       "style": {
         "noNonNullAssertion": "off"
